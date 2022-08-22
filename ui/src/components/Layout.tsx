@@ -21,7 +21,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
       padding="md"
       header={
         <Header height={60} p="xs">
-          <Container>
+          <Container styles={{ backgroundColor: "transparent" }}>
             <InnerHeader>
               <Heading>Leaderboard</Heading>
               <Menu shadow="md" width={200}>
@@ -48,7 +48,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
         },
       })}
     >
-      <Container style={{ backgroundColor: "white" }}>{children}</Container>
+      <Container>{children}</Container>
     </AppShell>
   );
 };
