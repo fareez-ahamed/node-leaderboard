@@ -1,9 +1,19 @@
-import { AppShell, Container, Header, Navbar } from "@mantine/core";
-import React, { PropsWithChildren } from "react";
+import { AppShell, Button, Container, Header, Menu } from "@mantine/core";
+import React from "react";
+import styled from "@emotion/styled";
 
 interface Props {
   children: React.ReactNode;
 }
+
+const InnerHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Heading = styled.h2`
+  margin: 0 0;
+`;
 
 export const Layout: React.FC<Props> = ({ children }) => {
   return (
@@ -11,7 +21,22 @@ export const Layout: React.FC<Props> = ({ children }) => {
       padding="md"
       header={
         <Header height={60} p="xs">
-          <h2 style={{ margin: "0 0" }}>Leaderboard</h2>
+          <Container>
+            <InnerHeader>
+              <Heading>Leaderboard</Heading>
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <Button>Fareez Ahamed</Button>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Label onClick={() => alert("Logging out")}>
+                    Logout
+                  </Menu.Label>
+                </Menu.Dropdown>
+              </Menu>
+            </InnerHeader>
+          </Container>
         </Header>
       }
       styles={(theme) => ({

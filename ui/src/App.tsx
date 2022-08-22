@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Leaderboard } from "./pages/Leaderboard";
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AddMember } from "./pages/AddMember";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ function App() {
         <MantineProvider withGlobalStyles withNormalizeCSS>
           <Routes>
             <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="member/add" element={<AddMember />} />
           </Routes>
         </MantineProvider>
       </QueryClientProvider>

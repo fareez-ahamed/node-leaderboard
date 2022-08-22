@@ -14,3 +14,7 @@ export const getLeaderboard = () => {
     { id: 32, name: "Fareez Ahamed", points: 348 },
   ]);
 };
+
+export const addMember = (data: { name: string }) => {
+  return new Promise((resolve, reject) => setTimeout(resolve, 1000));
+};
