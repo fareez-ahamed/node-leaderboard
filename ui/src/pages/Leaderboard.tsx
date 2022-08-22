@@ -36,7 +36,7 @@ const ActionCell = styled.td`
 const POINTS = [1, 2, 3, 5, 10, -1, -2, -3, -5, -10];
 
 export const Leaderboard = () => {
-  const [selectedTraineeId, setSelectedTraineeId] = useState<number>();
+  const [selectedTraineeId, setSelectedTraineeId] = useState<string>();
   const [rewardedPoints, setRewardedPoints] = useState<number>();
   const [opened, setOpened] = useState(false);
 
@@ -44,13 +44,17 @@ export const Leaderboard = () => {
 
   const addPointsMutation = useMutation(addPoints);
 
-  const traineeName = useMemo<string>(
-    () =>
-      query.data?.find((x) => x.id === selectedTraineeId)?.name ?? "No Name",
-    [query.data, selectedTraineeId]
-  );
+  const traineeName = useMemo<string>(() => {
+    if (query.isFetched) {
+      console.log(typeof query.data);
+      return (
+        query.data?.find((x) => x.id === selectedTraineeId)?.name ?? "No Name"
+      );
+    }
+    return "No Name";
+  }, [query.data, selectedTraineeId, query.isFetched]);
 
-  const openPointsDialog = (traineeId: number) => {
+  const openPointsDialog = (traineeId: string) => {
     setSelectedTraineeId(traineeId);
     setOpened(true);
   };
@@ -60,7 +64,7 @@ export const Leaderboard = () => {
     setOpened(false);
   };
 
-  const handleAddPoints = (traineeId: number, points: number) => {
+  const handleAddPoints = (traineeId: string, points: number) => {
     setRewardedPoints(points);
     addPointsMutation.mutateAsync({ traineeId, points }).then(() => {
       handleCloseDialog();
@@ -81,7 +85,6 @@ export const Leaderboard = () => {
               <thead>
                 <tr>
                   <NumericHeader>Rank</NumericHeader>
-                  <NumericHeader>ID</NumericHeader>
                   <th>Name</th>
                   <NumericHeader>Points</NumericHeader>
                   <ActionHeader>Actions</ActionHeader>
@@ -91,7 +94,6 @@ export const Leaderboard = () => {
                 {query.data?.map((row, i) => (
                   <tr key={row.name}>
                     <NumericCell>{i + 1}</NumericCell>
-                    <NumericCell>{row.id}</NumericCell>
                     <td>{row.name}</td>
                     <NumericCell>{row.points}</NumericCell>
                     <ActionCell>
@@ -124,6 +126,7 @@ export const Leaderboard = () => {
           <SimpleGrid cols={5}>
             {POINTS.map((point) => (
               <Button
+                key={"button" + point}
                 color={point > 0 ? "blue" : "red"}
                 loading={isRewardingPoints(point)}
                 onClick={() =>

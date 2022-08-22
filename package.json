@@ -5,6 +5,11 @@
   "license": "MIT",
   "private": "true",
   "workspaces": [
+    "api",
+    "contracts",
     "ui"
-  ]
+  ],
+  "scripts": {
+    "dev": "yarn workspace api dev & yarn workspace ui start"
+  }
 }
