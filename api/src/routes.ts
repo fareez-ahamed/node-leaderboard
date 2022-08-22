@@ -18,3 +18,12 @@ router.post("/api/members", (req: Request<{}, {}, { name: string }>, res) => {
     res.status(201).send();
   });
 });
+
+router.post(
+  "/api/members/:id/points",
+  (req: Request<{ id: string }, {}, { points: number }>, res) => {
+    req.store.addPoints(req.params.id, req.body.points).then(() => {
+      res.status(201).send();
+    });
+  }
+);

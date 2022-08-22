@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconCircleX, IconMenu2 } from "@tabler/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { ErrorResponse } from "contracts";
 import { useMemo, useState } from "react";
 import { addPoints, getLeaderboard } from "../api";
 import { Layout } from "../components/Layout";
@@ -42,7 +43,11 @@ export const Leaderboard = () => {
 
   const query = useQuery(["leaderboardData"], getLeaderboard);
 
-  const addPointsMutation = useMutation(addPoints);
+  const addPointsMutation = useMutation<
+    {},
+    ErrorResponse,
+    { traineeId: string; points: number }
+  >(addPoints);
 
   const traineeName = useMemo<string>(() => {
     if (query.isFetched) {
@@ -112,7 +117,7 @@ export const Leaderboard = () => {
           {query.isLoading && <LoadingOverlay visible={query.isLoading} />}
           {query.isError && (
             <Alert icon={<IconCircleX size={18} />} title="Error" color="red">
-              {addPointsMutation.error as string}
+              {query.error as string}
             </Alert>
           )}
         </Section>
@@ -139,7 +144,7 @@ export const Leaderboard = () => {
           </SimpleGrid>
           {addPointsMutation.isError && (
             <Alert icon={<IconCircleX size={18} />} title="Error" color="red">
-              {addPointsMutation.error as string}
+              {addPointsMutation.error.message}
             </Alert>
           )}
         </Stack>

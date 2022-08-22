@@ -41,7 +41,7 @@ export const login = (data: { username: string; password: string }) => {
 };
 
 export const addPoints = (data: { traineeId: string; points: number }) => {
-  return new Promise((resolve, reject) =>
-    setTimeout(() => resolve(null), 1000)
-  );
+  return axios.post(`/api/members/${data.traineeId}/points`, {
+    points: data.points,
+  });
 };
