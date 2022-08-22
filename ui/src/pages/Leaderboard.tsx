@@ -11,10 +11,11 @@ import {
 import { IconCircleX, IconMenu2 } from "@tabler/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ErrorResponse } from "contracts";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { addPoints, getLeaderboard } from "../api";
 import { Layout } from "../components/Layout";
 import { Section } from "../components/Section";
+import { AuthContext } from "../contexts/AuthContext";
 
 const NumericHeader = styled.th`
   text-align: right !important;
@@ -43,15 +44,16 @@ export const Leaderboard = () => {
 
   const query = useQuery(["leaderboardData"], getLeaderboard);
 
+  const { isLoggedIn, token } = useContext(AuthContext);
+
   const addPointsMutation = useMutation<
     {},
     ErrorResponse,
-    { traineeId: string; points: number }
+    { traineeId: string; points: number; token: string }
   >(addPoints);
 
   const traineeName = useMemo<string>(() => {
     if (query.isFetched) {
-      console.log(typeof query.data);
       return (
         query.data?.find((x) => x.id === selectedTraineeId)?.name ?? "No Name"
       );
@@ -71,11 +73,13 @@ export const Leaderboard = () => {
 
   const handleAddPoints = (traineeId: string, points: number) => {
     setRewardedPoints(points);
-    addPointsMutation.mutateAsync({ traineeId, points }).then(() => {
-      handleCloseDialog();
-      setRewardedPoints(undefined);
-      query.refetch();
-    });
+    addPointsMutation
+      .mutateAsync({ traineeId, points, token: token ?? "" })
+      .then(() => {
+        handleCloseDialog();
+        setRewardedPoints(undefined);
+        query.refetch();
+      });
   };
 
   const isRewardingPoints = (points: number) =>
@@ -92,7 +96,7 @@ export const Leaderboard = () => {
                   <NumericHeader>Rank</NumericHeader>
                   <th>Name</th>
                   <NumericHeader>Points</NumericHeader>
-                  <ActionHeader>Actions</ActionHeader>
+                  {isLoggedIn && <ActionHeader>Actions</ActionHeader>}
                 </tr>
               </thead>
               <tbody>
@@ -101,14 +105,16 @@ export const Leaderboard = () => {
                     <NumericCell>{i + 1}</NumericCell>
                     <td>{row.name}</td>
                     <NumericCell>{row.points}</NumericCell>
-                    <ActionCell>
-                      <Button
-                        size="xs"
-                        onClick={() => openPointsDialog(row.id)}
-                      >
-                        <IconMenu2 />
-                      </Button>
-                    </ActionCell>
+                    {isLoggedIn && (
+                      <ActionCell>
+                        <Button
+                          size="xs"
+                          onClick={() => openPointsDialog(row.id)}
+                        >
+                          <IconMenu2 />
+                        </Button>
+                      </ActionCell>
+                    )}
                   </tr>
                 ))}
               </tbody>

@@ -1,8 +1,10 @@
 import express from "express";
 import { MongoClient } from "mongodb";
-import { Store } from "./store";
+import { Store } from "./services/store";
 import { router } from "./routes";
 import morgan from "morgan";
+import { errorHandler } from "./middlewares";
+import { ConfigService } from "./services/configuration";
 
 declare global {
   namespace Express {
@@ -14,17 +16,18 @@ declare global {
 
 // const app = express();
 const PORT = process.env.PORT ?? 4000;
-const URI = process.env.DB_URI ?? "mongodb://localhost:27017/leaderboard";
 
-async function createApplication(dbUri: string) {
+async function createApplication() {
+  const configService = new ConfigService();
+
   // Create mongo client
-  const mongoClient = new MongoClient(dbUri);
-  console.log(`Connecting to database ${dbUri}`);
+  const mongoClient = new MongoClient(configService.getMongoURI());
+  console.log(`Connecting to database ${configService.getMongoURI()}`);
   await mongoClient.connect();
   console.log(`Connected successfully to database`);
 
   // Initialize Services
-  const store = new Store(mongoClient);
+  const store = new Store(mongoClient, configService);
 
   // Create a new app
   const app = express();
@@ -37,11 +40,12 @@ async function createApplication(dbUri: string) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(morgan("tiny"));
+  app.use("/api", router);
+  app.use(errorHandler);
 
   return app;
 }
 
-createApplication(URI).then((app) => {
-  app.use("/", router);
+createApplication().then((app) => {
   app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 });

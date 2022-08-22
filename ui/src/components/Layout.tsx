@@ -1,6 +1,8 @@
 import { AppShell, Button, Container, Header, Menu } from "@mantine/core";
-import React from "react";
+import React, { useContext } from "react";
 import styled from "@emotion/styled";
+import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   children: React.ReactNode;
@@ -16,6 +18,9 @@ const Heading = styled.h2`
 `;
 
 export const Layout: React.FC<Props> = ({ children }) => {
+  const { isLoggedIn, name, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   return (
     <AppShell
       padding="md"
@@ -26,14 +31,17 @@ export const Layout: React.FC<Props> = ({ children }) => {
               <Heading>Leaderboard</Heading>
               <Menu shadow="md" width={200}>
                 <Menu.Target>
-                  <Button>Fareez Ahamed</Button>
+                  {isLoggedIn ? (
+                    <Button>{name}</Button>
+                  ) : (
+                    <Button onClick={() => navigate("/login")}>Login</Button>
+                  )}
                 </Menu.Target>
-
-                <Menu.Dropdown>
-                  <Menu.Label onClick={() => alert("Logging out")}>
-                    Logout
-                  </Menu.Label>
-                </Menu.Dropdown>
+                {isLoggedIn && (
+                  <Menu.Dropdown>
+                    <Menu.Label onClick={() => logout()}>Logout</Menu.Label>
+                  </Menu.Dropdown>
+                )}
               </Menu>
             </InnerHeader>
           </Container>

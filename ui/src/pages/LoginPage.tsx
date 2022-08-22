@@ -3,8 +3,11 @@ import { Alert, Button, Container, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCircleX } from "@tabler/icons";
 import { useMutation } from "@tanstack/react-query";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { login } from "../api";
 import { Section } from "../components/Section";
+import { AuthContext } from "../contexts/AuthContext";
 
 interface FormValues {
   username: string;
@@ -20,6 +23,8 @@ const ScreenCenter = styled.div`
 `;
 
 export const LoginPage = () => {
+  const navigate = useNavigate();
+  const { setToken } = useContext(AuthContext);
   const form = useForm<FormValues>({
     initialValues: {
       username: "",
@@ -36,7 +41,10 @@ export const LoginPage = () => {
   const mutation = useMutation(login);
 
   const handleSumbit = (values: FormValues) => {
-    mutation.mutate(values);
+    mutation.mutateAsync(values).then((resp) => {
+      setToken(resp.token);
+      navigate("/leaderboard");
+    });
   };
 
   return (
